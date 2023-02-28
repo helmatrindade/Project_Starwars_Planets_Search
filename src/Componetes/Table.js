@@ -1,11 +1,25 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PlanetsContext from '../Context/PlanetsContext';
 
 function Table() {
   const { planets } = useContext(PlanetsContext);
 
+  const [search, setSearch] = useState('');
+
+  const searchPlanets = () => {
+    const filtraNome = planets
+      .filter((el) => el.name.toUpperCase().includes(search.toUpperCase()));
+    return filtraNome;
+  };
+
   return (
     <main>
+      <input
+        value={ search }
+        type="text"
+        data-testid="name-filter"
+        onChange={ (e) => setSearch(e.target.value) }
+      />
       <table>
         <thead>
           <tr>
@@ -25,7 +39,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {planets.map((planet) => (
+          {searchPlanets().map((planet) => (
             <tr key={ planet.name }>
               <td>{planet.name}</td>
               <td>{planet.rotation_period}</td>
