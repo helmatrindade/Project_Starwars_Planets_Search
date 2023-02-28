@@ -1,10 +1,11 @@
 import React from 'react';
 import './App.css';
+import Table from './Componetes/Table';
 
 function App() {
   return (
-    <span>Hello, App!</span>
+    <Table />
   );
 }
-// oi
+
 export default App;
