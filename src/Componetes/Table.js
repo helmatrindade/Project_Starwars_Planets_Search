@@ -1,5 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PlanetsContext from '../Context/PlanetsContext';
+
+const options = ['population', 'orbital_period',
+  'diameter', 'rotation_period', 'surface_water'];
 
 function Table() {
   const { planets } = useContext(PlanetsContext);
@@ -11,15 +14,36 @@ function Table() {
     condicao: 'maior que',
     value: '0',
   });
+
   // estado para armazenar os arrays de filtros selecionados
   const [filtrosSelecionados, setFiltrosSelecionados] = useState([]);
 
-  const searchPlanets = () => {
+  // estado para as opções da coluna
+  const [colunaOption, setColunaOption] = useState(options);
+
+  // estado para receber o array de filtros da função searchPlanets
+  const [resultFilter, setResultFilter] = useState([]);
+
+  const handleChange = ({ target: { value } }) => {
+    setSearch(value);
+  };
+
+  const searchName = () => {
     const filtraNome = planets
-      .filter((el) => el.name.toUpperCase().includes(search.toUpperCase()))
+      .filter((el) => el.name.toUpperCase().includes(search.toUpperCase()));
+    setResultFilter(filtraNome);
+  };
+
+  useEffect(() => {
+    searchName();
+  }, [search]);
+
+  const searchPlanets = (param) => {
+    const retorno = (resultFilter.length > 0 ? resultFilter : planets)
       .filter((planet) => {
-        if (filtrosSelecionados.length > 0) {
-          return filtrosSelecionados.every((filtro) => {
+        if (param) {
+          console.log(param);
+          return [param].every((filtro) => {
             switch (filtro.condicao) {
             case 'maior que':
               return Number(planet[filtro.coluna]) > Number(filtro.value);
@@ -32,7 +56,49 @@ function Table() {
         }
         return true;
       });
-    return filtraNome;
+    console.log(retorno);
+    return retorno;
+  };
+
+  const handleClick = (param) => {
+    if (param.length === 0) setResultFilter(planets);
+
+    const planetsFiltrado = planets.filter((planet) => {
+      const filterArray = param.map((fil) => {
+        if (fil.condicao === 'maior que') {
+          return +planet[fil.coluna] > +fil.value;
+        }
+        if (fil.condicao === 'menor que') {
+          return +planet[fil.coluna] < +fil.value;
+        }
+        if (fil.condicao === 'igual a') {
+          return +planet[fil.coluna] === +fil.value;
+        }
+        return false;
+      });
+      return filterArray.every((fil) => fil === true);
+    });
+    setResultFilter(planetsFiltrado);
+  };
+
+  const handleClickRemove = (param) => {
+    const upDate = filtrosSelecionados.filter((f) => f.coluna !== param);
+    setFiltrosSelecionados(upDate);
+    setColunaOption((prev) => [...prev, param]);
+
+    handleClick(upDate);
+  };
+
+  const handleSearch = () => {
+    setFiltrosSelecionados([...filtrosSelecionados, inputNumber]);
+
+    const removeColuna = colunaOption
+      .filter((filtro) => filtro !== inputNumber.coluna);
+
+    setColunaOption(removeColuna);
+    setInputNumber({ coluna: removeColuna[0], condicao: 'maior que', value: '0' });
+
+    setResultFilter(searchPlanets(inputNumber));
   };
 
   return (
@@ -41,7 +107,7 @@ function Table() {
         value={ search }
         type="text"
         data-testid="name-filter"
-        onChange={ (e) => setSearch(e.target.value) }
+        onChange={ handleChange }
       />
       <br />
       <select
@@ -49,11 +115,9 @@ function Table() {
         value={ inputNumber.coluna }
         onChange={ (e) => setInputNumber({ ...inputNumber, coluna: e.target.value }) }
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {colunaOption.map((coluna) => (
+          <option key={ coluna } value={ coluna }>{coluna}</option>
+        ))}
       </select>
       <select
         data-testid="comparison-filter"
@@ -72,15 +136,23 @@ function Table() {
       />
       <button
         data-testid="button-filter"
-        onClick={ () => {
-          setFiltrosSelecionados([...filtrosSelecionados, inputNumber]);
-        } }
+        onClick={ handleSearch }
       >
         Filtrar
       </button>
+      <button
+        data-testid="button-remove-filters"
+        onClick={ () => {
+          setColunaOption(options);
+          setResultFilter(planets);
+          setFiltrosSelecionados([]);
+        } }
+      >
+        Remover todas filtragens
+      </button>
       {
         filtrosSelecionados.map((filtro) => (
-          <div key={ filtro.coluna }>
+          <div key={ filtro.coluna } data-testid="filter">
             <span>
               {filtro.coluna}
               {' '}
@@ -88,6 +160,11 @@ function Table() {
               {' '}
               {filtro.value}
             </span>
+            <button
+              onClick={ () => handleClickRemove(filtro.coluna) }
+            >
+              X
+            </button>
           </div>
         ))
       }
@@ -110,7 +187,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {searchPlanets().map((planet) => (
+          {(resultFilter.length > 0 ? resultFilter : planets).map((planet) => (
             <tr key={ planet.name }>
               <td>{planet.name}</td>
               <td>{planet.rotation_period}</td>
