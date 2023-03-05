@@ -46,6 +46,9 @@ describe('Teste Toda a aplicação', () => {
     userEvent.type(value, '5100')
     userEvent.click(filtrar)
 
+    const botaoX = screen.getByRole('button', {name: /X/i});
+    userEvent.click(botaoX);
+
     userEvent.selectOptions(coluna, 'surface_water')
     userEvent.selectOptions(condicao, 'igual a')
     userEvent.type(value, '40')
@@ -62,31 +65,60 @@ describe('Teste Toda a aplicação', () => {
     expect(removerTodos).toBeInTheDocument();
   });
 
-  test('teste se ao clicar no button de limpar, é removido as filtragens', () => {
-    // const filtro = {
-    //   coluna: 'population',
-    //   condicao: 'maior que',
-    //   value: '5000',
-    // };
+  it("testa o renderização do selectedFilter", async () => {
+    render(<App />);
 
-    // const handleClickRemove = jest.fn();
+    const coluna = screen.getByTestId("column-filter")
+    const condicao = screen.getByTestId("comparison-filter")
+    const value = screen.getByTestId("value-filter")
 
-    // render(<App />);
+    userEvent.selectOptions(coluna, "surface_water")
+    userEvent.selectOptions(condicao, "menor que")
+    userEvent.type(value, "10")
 
-    // // await waitFor(() => {
-    // //   expect(global.fetch).toHaveBeenCalledTimes(1);
-    // // })
+    const button = screen.getByTestId("button-filter")
+    userEvent.click(button)
 
-    // const botaoRemover = screen.getByTestId('filter');
-    // userEvent.click(botaoRemover)
+    await waitFor(() => {
+      expect(screen.getByTestId('filter')).toBeInTheDocument()
+    })
+    expect(screen.getByTestId('filter')).toHaveTextContent("surface_water")
+
+    userEvent.selectOptions(coluna, "diameter")
+    userEvent.selectOptions(condicao, "igual a")
+    userEvent.type(value, "12500")
+
+    userEvent.click(button)
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('filter')).toHaveLength(2)
+      expect(screen.getAllByTestId('filter')[0]).toHaveTextContent("surface_water") 
+      expect(screen.getAllByTestId('filter')[1]).toHaveTextContent("diameter")
+    })    
+
+    userEvent.selectOptions(coluna, "population")
+    userEvent.selectOptions(condicao, "maior que")
+    userEvent.type(value, "100000")
+
+    userEvent.click(button)
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('filter')).toHaveLength(3)
+      expect(screen.getAllByTestId('filter')[0]).toHaveTextContent("surface_water") 
+      expect(screen.getAllByTestId('filter')[1]).toHaveTextContent("diameter")
+      expect(screen.getAllByTestId('filter')[2]).toHaveTextContent("population")
+    })
+
+    const btnX = screen.getAllByRole('button', {name: /X/i})
+    userEvent.click(btnX[0])
     
-    // expect(handleClickRemove).toHaveBeenCalledWith(filtro.coluna);
+    await waitFor(() => {
+      expect(screen.getAllByTestId('filter')).toHaveLength(2)
+      expect(screen.getAllByTestId('filter')[0]).toHaveTextContent("diameter") 
+      expect(screen.getAllByTestId('filter')[1]).toHaveTextContent("population")
+    })
 
-    // const filtroRemovido = screen.queryByText(`${filtro.coluna} ${filtro.condicao} ${filtro.value}`);
-    // expect(filtroRemovido).toBeNull();
-
+    userEvent.click(btnX[1])
   });
-
-
 });
 
