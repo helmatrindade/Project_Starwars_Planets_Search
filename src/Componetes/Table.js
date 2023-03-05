@@ -42,7 +42,6 @@ function Table() {
     const retorno = (resultFilter.length > 0 ? resultFilter : planets)
       .filter((planet) => {
         if (param) {
-          console.log(param);
           return [param].every((filtro) => {
             switch (filtro.condicao) {
             case 'maior que':
@@ -56,7 +55,6 @@ function Table() {
         }
         return true;
       });
-    console.log(retorno);
     return retorno;
   };
 
@@ -189,7 +187,7 @@ function Table() {
         <tbody>
           {(resultFilter.length > 0 ? resultFilter : planets).map((planet) => (
             <tr key={ planet.name }>
-              <td>{planet.name}</td>
+              <td data-testid="planet-name">{planet.name}</td>
               <td>{planet.rotation_period}</td>
               <td>{planet.orbital_period}</td>
               <td>{planet.diameter}</td>
