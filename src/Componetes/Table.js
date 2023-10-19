@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PlanetsContext from '../Context/PlanetsContext';
+import '../styles/Table.css';
 
 const options = ['population', 'orbital_period',
   'diameter', 'rotation_period', 'surface_water'];
@@ -100,54 +101,56 @@ function Table() {
   };
 
   return (
-    <main>
-      <input
-        value={ search }
-        type="text"
-        data-testid="name-filter"
-        onChange={ handleChange }
-      />
-      <br />
-      <select
-        data-testid="column-filter"
-        value={ inputNumber.coluna }
-        onChange={ (e) => setInputNumber({ ...inputNumber, coluna: e.target.value }) }
-      >
-        {colunaOption.map((coluna) => (
-          <option key={ coluna } value={ coluna }>{coluna}</option>
-        ))}
-      </select>
-      <select
-        data-testid="comparison-filter"
-        value={ inputNumber.condicao }
-        onChange={ (e) => setInputNumber({ ...inputNumber, condicao: e.target.value }) }
-      >
-        <option value="maior que">maior que</option>
-        <option value="menor que">menor que</option>
-        <option value="igual a">igual a</option>
-      </select>
-      <input
-        type="number"
-        data-testid="value-filter"
-        value={ inputNumber.value }
-        onChange={ (e) => setInputNumber({ ...inputNumber, value: e.target.value }) }
-      />
-      <button
-        data-testid="button-filter"
-        onClick={ handleSearch }
-      >
-        Filtrar
-      </button>
-      <button
-        data-testid="button-remove-filters"
-        onClick={ () => {
-          setColunaOption(options);
-          setResultFilter(planets);
-          setFiltrosSelecionados([]);
-        } }
-      >
-        Remover todas filtragens
-      </button>
+    <main className="Container">
+      <div className="allButtons">
+        <input
+          value={ search }
+          type="text"
+          data-testid="name-filter"
+          onChange={ handleChange }
+        />
+        <br />
+        <select
+          data-testid="column-filter"
+          value={ inputNumber.coluna }
+          onChange={ (e) => setInputNumber({ ...inputNumber, coluna: e.target.value }) }
+        >
+          {colunaOption.map((coluna) => (
+            <option key={ coluna } value={ coluna }>{coluna}</option>
+          ))}
+        </select>
+        <select
+          data-testid="comparison-filter"
+          value={ inputNumber.condicao }
+          onChange={ (e) => setInputNumber({ ...inputNumber, condicao: e.target.value }) }
+        >
+          <option value="maior que">maior que</option>
+          <option value="menor que">menor que</option>
+          <option value="igual a">igual a</option>
+        </select>
+        <input
+          type="number"
+          data-testid="value-filter"
+          value={ inputNumber.value }
+          onChange={ (e) => setInputNumber({ ...inputNumber, value: e.target.value }) }
+        />
+        <button
+          data-testid="button-filter"
+          onClick={ handleSearch }
+        >
+          Filtrar
+        </button>
+        <button
+          data-testid="button-remove-filters"
+          onClick={ () => {
+            setColunaOption(options);
+            setResultFilter(planets);
+            setFiltrosSelecionados([]);
+          } }
+        >
+          Remover todas filtragens
+        </button>
+      </div>
       {
         filtrosSelecionados.map((filtro) => (
           <div key={ filtro.coluna } data-testid="filter">
@@ -166,7 +169,7 @@ function Table() {
           </div>
         ))
       }
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th>name</th>

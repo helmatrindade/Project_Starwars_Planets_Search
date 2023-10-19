@@ -1,0 +1,23 @@
+.Container {
+  border: 1px solid black;
+  border-radius: 20px;
+  box-sizing: border-box;
+  height: 750px;
+  left: 38px;
+  max-width: 1200px;
+  overflow: auto;
+  position: absolute;
+  top: 703px;
+}
+
+.allButtons {
+  border: 1px solid black;
+  display: flex;
+  justify-content: space-around;
+}
+
+.table {
+  border: 1px solid black;
+  height: 90%;
+}
+
